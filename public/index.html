@@ -1,91 +1,289 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta charset="utf-8">
-<title>Payroll • Dashboard</title>
+<meta charset="UTF-8">
+<title>Home • Payroll System</title>
 <meta name="viewport" content="width=device-width,initial-scale=1">
+
 <style>
-  :root{--bg:#f4f7fb;--card:#fff;--accent:#2563eb;--muted:#6b7280}
-  *{box-sizing:border-box} body{margin:0;font-family:Poppins,Arial;background:var(--bg)}
-  header{background:linear-gradient(90deg,#2563eb,#3b82f6);color:#fff;padding:18px 24px;display:flex;align-items:center;justify-content:space-between}
-  header h1{margin:0;font-size:20px}
-  .wrap{max-width:1100px;margin:24px auto;padding:12px}
-  .grid{display:grid;grid-template-columns:260px 1fr;gap:18px}
-  nav .card{padding:12px}
-  .menu a{display:block;padding:10px;border-radius:8px;color:#0b1220;text-decoration:none;margin-bottom:8px}
-  .menu a:hover{background:#eef6ff}
-  .card{background:var(--card);border-radius:12px;box-shadow:0 8px 20px rgba(12,15,20,0.06);padding:18px}
-  .stats{display:flex;gap:12px}
-  .stat{flex:1;padding:16px;border-radius:10px;background:linear-gradient(180deg,#f8fbff,#eef6ff);text-align:center}
-  .btn{background:var(--accent);color:#fff;padding:10px 12px;border-radius:8px;border:0;cursor:pointer}
-  footer{color:var(--muted);text-align:center;padding:14px}
+  body{
+    font-family:Poppins;margin:0;
+    background:linear-gradient(135deg,#e3eeff,#f2f6ff,#ffffff);
+    animation:bgShift 12s infinite alternate ease;
+  }
+
+  @keyframes bgShift{
+    0%{background:linear-gradient(135deg,#e3eeff,#f2f6ff,#ffffff);}
+    100%{background:linear-gradient(135deg,#dbeafe,#eef2ff,#ffffff);}
+  }
+
+  /* -------- HERO SECTION -------- */
+  .hero{
+    max-width:900px;margin:80px auto;text-align:center;
+    padding:20px;
+    animation:fadeIn 1.3s ease;
+  }
+  @keyframes fadeIn{
+    from{opacity:0;transform:translateY(30px);}
+    to{opacity:1;transform:translateY(0);}
+  }
+
+  .hero h1{
+    font-size:50px;font-weight:800;margin-bottom:12px;
+    color:#1e293b;letter-spacing:1px;
+    text-shadow:0 4px 15px rgba(0,0,0,0.15);
+  }
+  .hero p{
+    font-size:22px;color:#475569;margin-bottom:28px;
+  }
+  .btn{
+    background:#2563eb;color:white;padding:14px 32px;border-radius:14px;
+    text-decoration:none;font-size:19px;font-weight:600;
+    box-shadow:0 8px 25px rgba(37,99,235,0.35);
+    transition:.4s;
+  }
+  .btn:hover{
+    background:#1e4ed8;
+    transform:translateY(-5px) scale(1.03);
+    box-shadow:0 12px 30px rgba(37,99,235,0.45);
+  }
+
+  /* -------- NEW SECTIONS -------- */
+  .section{
+    max-width:1000px;margin:70px auto;background:white;padding:50px;
+    border-radius:22px;box-shadow:0 15px 40px rgba(0,0,0,0.10);
+    backdrop-filter:blur(4px);
+    animation:fadeIn 1.3s ease;
+  }
+  .section h2{
+    font-size:36px;margin-bottom:12px;color:#1e293b;text-align:center;
+    font-weight:800;
+  }
+  .section p{
+    color:#475569;font-size:18px;text-align:center;margin-bottom:30px;
+  }
+
+  /* FEATURES GRID */
+  .features{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+    gap:25px;margin-top:25px;
+  }
+
+  .feature-box{
+    background:linear-gradient(135deg,#f0f6ff,#eaf1ff);
+    padding:26px;border-radius:18px;text-align:center;
+    box-shadow:0 5px 18px rgba(0,0,0,0.08);
+    transition:.4s;border:1px solid #d7e3ff;
+  }
+  .feature-box:hover{
+    transform:translateY(-10px) scale(1.02);
+    box-shadow:0 15px 40px rgba(0,0,0,0.15);
+  }
+
+  .feature-box h3{
+    margin-bottom:12px;font-size:23px;color:#1e40af;font-weight:600;
+  }
+  .feature-box p{
+    color:#475569;font-size:15px;
+  }
+
+  /* ABOUT SECTION */
+  .about{
+    margin-top:40px;font-size:19px;color:#334155;
+    line-height:1.65;text-align:center;
+  }
+
+  /* -------- COOL NAVBAR -------- */
+  .navbar{
+    background:linear-gradient(90deg,#1e3a8a,#2563eb,#3b82f6);
+    padding:12px 18px;color:#fff;
+    display:flex;align-items:center;justify-content:center;
+    position:relative;
+    box-shadow:0 5px 20px rgba(0,0,0,0.2);
+  }
+
+  .navbar h2{
+    margin:0;font-size:28px;font-weight:800;
+    letter-spacing:1px;
+  }
+
+  #menuBtn{
+    font-size:28px;background:none;border:0;color:white;cursor:pointer;
+    position:absolute;right:20px;
+    transition:.3s;
+  }
+  #menuBtn:hover{transform:scale(1.15);}
+
+  .menu-box{
+    position:absolute;right:18px;top:60px;
+    background:white;width:220px;border-radius:12px;
+    box-shadow:0 12px 30px rgba(0,0,0,.20);
+    display:none;overflow:hidden;
+    animation:fadeMenu .4s ease;
+  }
+
+  @keyframes fadeMenu{
+    from{opacity:0;transform:translateY(-10px);}
+    to{opacity:1;transform:translateY(0);}
+  }
+
+  .menu-box.show{display:block;}
+  .menu-box a{
+    display:block;padding:14px;color:#111;text-decoration:none;
+    border-bottom:1px solid #eee;font-size:16px;transition:.3s;
+  }
+  .menu-box a:hover{
+    background:#e8f0ff;padding-left:18px;
+  }
+
+  /* ---- DASHBOARD SNAPSHOT ---- */
+  .dashCards{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:22px;
+    margin-top:40px;
+  }
+  .dashCard{
+    background:white;padding:22px;border-radius:18px;
+    box-shadow:0 10px 35px rgba(0,0,0,0.08);
+    text-align:center;
+    border:1px solid #d7e3ff;
+    transition:.3s;
+  }
+  .dashCard:hover{
+    transform:translateY(-6px);
+    box-shadow:0 15px 40px rgba(0,0,0,0.15);
+  }
+  .dashCard span{
+    font-size:18px;font-weight:600;color:#475569;
+  }
+  .dashCard h2{
+    font-size:40px;margin:10px 0;color:#1e40af;
+  }
+
 </style>
 </head>
+
 <body>
-<header>
-  <h1>Payroll Management</h1>
-  <div>
-    <span id="who" style="margin-right:12px;color:#eaf2ff">Not logged in</span>
-    <button id="logout" class="btn" style="display:none">Logout</button>
-  </div>
-</header>
 
-<div class="wrap">
-  <div class="grid">
-    <nav>
-      <div class="card">
-        <div style="font-weight:700;margin-bottom:8px">Navigation</div>
-        <div class="menu">
-          <a href="index.html">Dashboard</a>
-          <a href="auth.html">Login / Register</a>
-          <a href="employees.html">Employees</a>
-          <a href="attendance.html">Attendance</a>
-          <a href="payroll.html">Payroll</a>
-          <a href="reports.html">Reports</a>
-        </div>
-      </div>
-    </nav>
+<!-- 🔵 NAVBAR -->
+<div class="navbar">
+  <h2>Payroll System</h2>
+  <button id="menuBtn">☰</button>
+</div>
 
-    <main>
-      <div class="card">
-        <h2>Dashboard</h2>
-        <p class="muted">Quick overview</p>
-        <div class="stats" style="margin-top:12px">
-          <div class="stat">Employees<br><div id="empCount" style="font-size:24px;font-weight:700;margin-top:8px">0</div></div>
-          <div class="stat">Payrolls<br><div id="payCount" style="font-size:24px;font-weight:700;margin-top:8px">0</div></div>
-        </div>
-      </div>
-
-      <div class="card" style="margin-top:14px">
-        <h3>Recent Actions</h3>
-        <ul id="recent" style="margin-top:10px;color:var(--muted)"></ul>
-      </div>
-    </main>
-  </div>
-  <footer>Made for DBMS project • All inline CSS & JS</footer>
+<div class="menu-box" id="menuBox">
+  <a href="index.html">Home</a>
+  <a href="employees.html">Employees</a>
+  <a href="attendance.html">Attendance</a>
+  <a href="payroll.html">Payroll</a>
+  <a href="reports.html">Reports</a>
+  <a href="#" onclick="logout()">Logout</a>
 </div>
 
 <script>
-// if no token in localStorage, redirect user to auth page
-if (!localStorage.getItem('token')) {
-  // allow a small delay so server-side root redirect doesn't conflict
-  window.location.href = '/auth.html';
+document.getElementById('menuBtn').onclick = ()=>{
+  document.getElementById('menuBox').classList.toggle('show');
+};
+
+function logout(){
+  localStorage.removeItem('token');
+  window.location.href = 'auth.html';
+}
+
+if(!localStorage.getItem('token')){
+  window.location.href = 'auth.html';
 }
 </script>
 
+<!-- HERO -->
+<div class="hero">
+  <h1>Welcome to Payroll Management System</h1>
+  <p>Simplify employee management, attendance, and payroll with our modern system.</p>
+
+  <!-- ⭐ FIXED BUTTON ⭐ -->
+  <a class="btn" href="dashboard.html">Get Started</a>
+</div>
+
+<!-- FEATURES -->
+<div class="section">
+  <h2>System Features</h2>
+  <p>Your complete HR & Payroll solution.</p>
+
+  <div class="features">
+    <div class="feature-box">
+      <h3>👤 Employee Directory</h3>
+      <p>Add, edit & manage all employees easily.</p>
+    </div>
+
+    <div class="feature-box">
+      <h3>📅 Daily Attendance</h3>
+      <p>Track workdays and maintain attendance logs.</p>
+    </div>
+
+    <div class="feature-box">
+      <h3>💰 Auto Payroll Processing</h3>
+      <p>Automatic salary breakdown with HRA, DA, PF & TDS.</p>
+    </div>
+
+    <div class="feature-box">
+      <h3>📊 Reports</h3>
+      <p>Generate salary slips and payroll history.</p>
+    </div>
+
+    <div class="feature-box">
+      <h3>🔐 Secure Login</h3>
+      <p>JWT-based secure authentication system.</p>
+    </div>
+
+    <div class="feature-box">
+      <h3>⚙️ MySQL Powered</h3>
+      <p>Fast & reliable database structure.</p>
+    </div>
+  </div>
+
+  <!-- DASHBOARD SNAPSHOT -->
+  <br><br>
+  <h2>Dashboard Snapshot</h2>
+  <p>Your system summary at a glance</p>
+
+  <div class="dashCards">
+    <div class="dashCard">
+      <span>Total Employees</span>
+      <h2 id="empCount">0</h2>
+    </div>
+    <div class="dashCard">
+      <span>Total Payrolls</span>
+      <h2 id="payCount">0</h2>
+    </div>
+    <div class="dashCard">
+      <span>Total Attendance</span>
+      <h2 id="attCount">0</h2>
+    </div>
+  </div>
+
+  <div class="about">
+    This Payroll System simplifies workforce management with clean UI,
+    secure authentication, automated payroll and employee analytics.
+  </div>
+
+</div>
+
 <script>
 async function loadStats(){
-  const token = localStorage.getItem('token');
-  if(token){ document.getElementById('who').innerText = 'Logged in'; document.getElementById('logout').style.display='inline-block'; }
-  try{
-    const r = await fetch('/api/stats', { headers: { 'Authorization': 'Bearer ' + token }});
-    const j = await r.json();
-    document.getElementById('empCount').innerText = j.employees || 0;
-    document.getElementById('payCount').innerText = j.payrolls || 0;
-  }catch(e){ console.error(e); }
+  const res = await fetch("/api/stats", {
+    headers:{ "Authorization":"Bearer " + localStorage.getItem("token") }
+  });
+
+  const d = await res.json();
+  empCount.innerText = d.employees || 0;
+  payCount.innerText = d.payrolls || 0;
+  attCount.innerText = d.attendance || 0;
 }
-document.getElementById('logout').addEventListener('click', ()=>{ localStorage.removeItem('token'); location.reload(); });
+
 loadStats();
 </script>
+
 </body>
 </html>

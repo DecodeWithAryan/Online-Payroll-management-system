@@ -4,194 +4,645 @@
 <meta charset="utf-8">
 <title>Employees - Payroll</title>
 <meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
 <style>
-  body{margin:0;font-family:Poppins,Arial;background:#f6f8fb}
-  header{background:linear-gradient(90deg,#2563eb,#3b82f6);color:#fff;padding:14px;text-align:center}
-  .wrap{max-width:1000px;margin:18px auto;padding:12px}
-  .card{background:#fff;padding:18px;border-radius:12px;box-shadow:0 6px 18px rgba(0,0,0,0.06);margin-bottom:14px}
-  input{padding:10px;border-radius:8px;border:1px solid #e6eefb;width:100%;margin-top:8px}
-  .row{display:flex;gap:10px}
-  .col{flex:1}
-  button{background:#2563eb;color:#fff;padding:10px;border-radius:8px;border:0;cursor:pointer;margin-top:10px}
-  table{width:100%;border-collapse:collapse;margin-top:12px}
-  th,td{padding:10px;border-bottom:1px solid #eef2f6;text-align:left}
+/* ---------- Fonts & Base ---------- */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap');
+:root{
+  --accent:#2563eb;
+  --accent-2:#1e40af;
+  --glass:#ffffffcc;
+  --muted:#64748b;
+  --success:#10b981;
+  --danger:#ef4444;
+  --card-shadow: 0 10px 35px rgba(14,30,70,0.08);
+}
+*{box-sizing:border-box}
+body{
+  margin:0;font-family:Poppins,Arial,Helvetica;background:linear-gradient(135deg,#e8f2ff,#f8fbff);
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+}
+
+/* ---------- NAVBAR ---------- */
+.navbar{
+  background:linear-gradient(90deg,var(--accent-2),var(--accent));
+  color:#fff;padding:14px 20px;display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;z-index:100;box-shadow:0 6px 30px rgba(0,0,0,0.12);
+}
+.nav-left{display:flex;align-items:center;gap:16px}
+.brand{font-weight:800;font-size:20px;letter-spacing:.6px}
+.nav-actions{display:flex;gap:10px;align-items:center}
+#menuBtn{display:none;background:none;border:0;color:white;font-size:22px;cursor:pointer}
+
+/* ---------- LAYOUT ---------- */
+.container{max-width:1150px;margin:26px auto;padding:14px}
+.header-row{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:18px}
+.page-title{font-size:22px;font-weight:700;color:#0f172a}
+
+/* ---------- GRID ---------- */
+.grid{
+  display:grid;
+  grid-template-columns:360px 1fr;
+  gap:20px;
+}
+
+/* ---------- LEFT CARD (form) ---------- */
+.card{
+  background:var(--glass);padding:20px;border-radius:14px;box-shadow:var(--card-shadow);
+  border:1px solid rgba(37,99,235,0.06)
+}
+.card h3{margin:0 0 10px 0;color:#0f172a}
+.field{margin-top:10px}
+.input, .select{
+  width:100%;padding:10px;border-radius:10px;border:1px solid #d7e3ff;font-size:14px;
+  transition:all .18s ease;
+}
+.input:focus, .select:focus{outline:none;box-shadow:0 6px 20px rgba(37,99,235,0.12);border-color:var(--accent)}
+.small{display:flex;gap:10px}
+.small .col{flex:1}
+.btn-primary{
+  width:100%;padding:12px;border-radius:10px;border:0;background:linear-gradient(180deg,var(--accent),var(--accent-2));
+  color:white;font-weight:700;cursor:pointer;margin-top:14px;box-shadow:0 8px 25px rgba(37,99,235,0.24)
+}
+.btn-primary:hover{transform:translateY(-3px)}
+
+/* ---------- photo preview ---------- */
+.photo-uploader{display:flex;gap:12px;align-items:center;margin-top:10px}
+.avatar{
+  width:72px;height:72px;border-radius:12px;background:linear-gradient(135deg,#f1f7ff,#eef6ff);
+  display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--accent-2);font-size:20px;border:1px solid rgba(30,58,138,0.06);
+  overflow:hidden;
+}
+.avatar img{width:100%;height:100%;object-fit:cover;border-radius:12px}
+
+/* ---------- TOP CONTROLS (search / filters) ---------- */
+.controls{
+  display:flex;gap:12px;align-items:center;margin-bottom:12px;
+  flex-wrap:wrap;
+}
+.search{
+  flex:1;display:flex;gap:8px;align-items:center;
+  background:#fff;border-radius:10px;padding:8px 10px;box-shadow:0 6px 20px rgba(12,15,20,0.03)
+}
+.search input{border:0;outline:none;font-size:14px;width:100%}
+.filter, .sort{
+  min-width:180px;background:#fff;border-radius:10px;padding:8px;border:1px solid #eef4ff;
+}
+
+/* ---------- TABLE ---------- */
+.tableWrap{background:var(--glass);padding:12px;border-radius:12px;box-shadow:var(--card-shadow)}
+.table{
+  width:100%;border-collapse:collapse;border-radius:8px;overflow:hidden;font-size:14px
+}
+.table th, .table td{padding:12px 10px;text-align:left;border-bottom:1px solid #eef4ff}
+.table th{background:#f8fbff;cursor:pointer;color:#0f172a;font-weight:700}
+.table tr:hover td{background:#fbfdff}
+.avatar-sm{width:36px;height:36px;border-radius:8px;overflow:hidden;display:inline-block;margin-right:8px}
+.badge{display:inline-block;padding:6px 10px;border-radius:999px;font-weight:700;font-size:12px}
+.dept-it{background:#e0f2fe;color:#075985}
+.dept-hr{background:#dcfce7;color:#166534}
+.dept-sales{background:#fff1db;color:#92400e}
+.high-sal{box-shadow:0 8px 30px rgba(37,99,235,0.12);border-left:4px solid #2563eb}
+
+/* ---------- ACTION BUTTONS ---------- */
+.action-btn{padding:6px 10px;border-radius:8px;border:0;cursor:pointer;font-weight:700}
+.edit-btn{background:#facc15;color:#1f2937}
+.delete-btn{background:#ef4444;color:white}
+
+/* ---------- PAGINATION ---------- */
+.pagination{display:flex;gap:8px;align-items:center;justify-content:flex-end;margin-top:12px}
+.page-btn{padding:8px 12px;border-radius:8px;border:1px solid #e6eefb;background:white;cursor:pointer}
+
+/* ---------- MODAL ---------- */
+.modal-backdrop{
+  position:fixed;left:0;top:0;width:100%;height:100%;background:rgba(0,0,0,0.45);
+  display:none;align-items:center;justify-content:center;z-index:300
+}
+.modal{
+  width:540px;background:white;border-radius:14px;padding:18px;box-shadow:0 12px 40px rgba(15,23,42,0.2)
+}
+.modal h3{margin-top:0}
+.modal .row{display:flex;gap:10px}
+.close-x{position:absolute;right:18px;top:14px;background:none;border:0;font-size:20px;cursor:pointer}
+
+/* ---------- TOAST ---------- */
+.toast-wrap{position:fixed;right:20px;bottom:20px;display:flex;flex-direction:column;gap:8px;z-index:400}
+.toast{
+  padding:12px 16px;border-radius:10px;color:white;font-weight:700;box-shadow:0 8px 30px rgba(11,15,30,0.2);
+  transform:translateY(8px);opacity:0;transition:all .35s;
+}
+.toast.show{transform:translateY(0);opacity:1}
+.toast-success{background:var(--success)}
+.toast-error{background:var(--danger)}
+/* ---------- RESPONSIVE ---------- */
+@media(max-width:980px){
+  .grid{grid-template-columns:1fr;gap:14px}
+  .modal{width:90%}
+  #menuBtn{display:block}
+}
 </style>
 </head>
 <body>
-<header><div style="font-weight:700">Employees</div></header>
 
-<div class="wrap">
-  <div class="card">
-    <h3>Add Employee</h3>
-    <div class="row">
-      <div class="col"><input id="ename" placeholder="Name"></div>
-      <div class="col"><input id="eemail" placeholder="Email"></div>
-    </div>
-    <div class="row" style="margin-top:8px">
-      <div class="col"><input id="edept" placeholder="Department"></div>
-      <div class="col"><input id="esalary" placeholder="Basic Salary" type="number"></div>
-    </div>
-    <button onclick="addEmployee()">Save Employee</button>
+<!-- NAVBAR -->
+<div class="navbar">
+  <div class="nav-left">
+    <div class="brand">Payroll System</div>
   </div>
-
-  <div class="card">
-    <h3>All Employees</h3>
-    <table id="etable"><tr><th>Name</th><th>Email</th><th>Department</th><th>Basic</th><th>Action</th></tr></table>
+  <div class="nav-actions">
+    <div style="color:#eaf2ff;font-weight:700">Employees</div>
   </div>
 </div>
 
+<!-- CONTAINER -->
+<div class="container">
+  <div class="header-row">
+    <div class="page-title">Employee Management</div>
+    <div style="color:var(--muted)">Manage your employees, search, filter, edit & upload photos</div>
+  </div>
+
+  <div class="grid">
+    <!-- LEFT: FORM -->
+    <div class="card">
+      <h3 id="formTitle">Add Employee</h3>
+
+      <div class="field">
+        <label style="font-weight:600">Name</label>
+        <input id="ename" class="input" placeholder="Full name">
+      </div>
+
+      <div class="field">
+        <label style="font-weight:600">Email</label>
+        <input id="eemail" class="input" placeholder="Email address">
+      </div>
+
+      <div class="small field" style="margin-top:8px">
+        <div class="col">
+          <label style="font-weight:600">Department</label>
+          <select id="edept" class="select">
+            <option value="">-- Select --</option>
+            <option>IT</option>
+            <option>HR</option>
+            <option>Sales</option>
+            <option>Accounts</option>
+            <option>Admin</option>
+          </select>
+        </div>
+        <div class="col">
+          <label style="font-weight:600">Basic Salary</label>
+          <input id="esalary" class="input" type="number" placeholder="e.g. 20000">
+        </div>
+      </div>
+
+      <div class="field">
+        <label style="font-weight:600">Profile Photo (optional)</label>
+        <div class="photo-uploader">
+          <div class="avatar" id="photoPreview">A</div>
+          <input id="photoInput" type="file" accept="image/*">
+        </div>
+      </div>
+
+      <button class="btn-primary" id="saveBtn">Save Employee</button>
+    </div>
+
+    <!-- RIGHT: LIST & CONTROLS -->
+    <div>
+      <div class="card tableWrap">
+        <div class="controls">
+          <div class="search">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="#64748b"><path d="M21 21l-4.35-4.35"></path><circle cx="10.5" cy="10.5" r="6.5" stroke-width="0" fill="#64748b"/></svg>
+            <input id="searchInput" placeholder="Search by name or email...">
+            <button id="clearSearch" style="border:0;background:none;color:var(--muted);cursor:pointer">✕</button>
+          </div>
+
+          <select id="deptFilter" class="filter">
+            <option value="">All Departments</option>
+            <option>IT</option>
+            <option>HR</option>
+            <option>Sales</option>
+            <option>Accounts</option>
+            <option>Admin</option>
+          </select>
+
+          <select id="sortSelect" class="sort">
+            <option value="new">Sort: Newest</option>
+            <option value="name-asc">Name ↑</option>
+            <option value="name-desc">Name ↓</option>
+            <option value="salary-desc">Salary High → Low</option>
+            <option value="salary-asc">Salary Low → High</option>
+          </select>
+        </div>
+
+        <table class="table" id="etable">
+          <thead>
+            <tr>
+              <th style="width:36%">Employee</th>
+              <th style="width:18%">Department</th>
+              <th style="width:18%">Basic</th>
+              <th style="width:28%">Action</th>
+            </tr>
+          </thead>
+          <tbody id="tbody"></tbody>
+        </table>
+
+        <div class="pagination" id="pagination"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- EDIT MODAL -->
+<div class="modal-backdrop" id="modalBackdrop">
+  <div class="modal" role="dialog" aria-modal="true">
+    <button class="close-x" id="modalClose">✕</button>
+    <h3>Edit Employee</h3>
+
+    <div class="row" style="margin-top:12px">
+      <div style="flex:1">
+        <label style="font-weight:600">Name</label>
+        <input id="m_name" class="input">
+      </div>
+      <div style="width:140px">
+        <label style="font-weight:600">Salary</label>
+        <input id="m_salary" class="input" type="number">
+      </div>
+    </div>
+
+    <div style="margin-top:10px">
+      <label style="font-weight:600">Email</label>
+      <input id="m_email" class="input" disabled>
+    </div>
+
+    <div style="margin-top:10px">
+      <label style="font-weight:600">Department</label>
+      <select id="m_dept" class="select">
+        <option>IT</option><option>HR</option><option>Sales</option><option>Accounts</option><option>Admin</option>
+      </select>
+    </div>
+
+    <div style="margin-top:10px;display:flex;gap:10px;align-items:center">
+      <div class="avatar" id="m_photo_preview">A</div>
+      <input id="m_photo_input" type="file" accept="image/*">
+    </div>
+
+    <div style="display:flex;gap:10px;margin-top:12px;justify-content:flex-end">
+      <button class="page-btn" id="modalCancel">Cancel</button>
+      <button class="btn-primary" id="modalSave">Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOASTS -->
+<div class="toast-wrap" id="toastWrap"></div>
+
 <script>
+/* ============================
+   Client-side helpers & state
+   ============================ */
 
-let updateId = null;   // Edit mode off initially
+const PAGE_SIZE = 5;
+let allEmployees = []; // raw from server
+let filteredEmployees = [];
+let currentPage = 1;
+let currentSort = 'new';
+let currentSearch = '';
+let currentDept = '';
+let editingId = null;
+let stagedPhoto = null;     // for add form
+let modalStagedPhoto = null; // for modal
 
-// =====================================
-// ADD or UPDATE EMPLOYEE
-// =====================================
-async function addEmployee(){
-
-    const body = {
-        name: ename.value.trim(),
-        email: eemail.value.trim(),
-        department: edept.value.trim(),
-        basic_salary: esalary.value.trim()
-    };
-
-    if(!body.name || !body.email || !body.department || !body.basic_salary){
-        alert("Please fill all fields.");
-        return;
-    }
-
-    // ============== UPDATE MODE ==============
-    if(updateId){
-        const res = await fetch(`/api/employees/${updateId}`, {
-            method: "PUT",
-            headers:{
-                "Content-Type":"application/json",
-                "Authorization":"Bearer " + localStorage.getItem("token")
-            },
-            body: JSON.stringify(body)
-        });
-
-        const out = await res.json();
-        alert(out.message || "Updated");
-
-        updateId = null;
-        clearForm();
-        loadEmployees();
-        return;
-    }
-
-    // ============== ADD MODE ==============
-    const res = await fetch("/api/employees", {
-        method: "POST",
-        headers:{
-            "Content-Type":"application/json",
-            "Authorization":"Bearer " + localStorage.getItem("token")
-        },
-        body: JSON.stringify(body)
-    });
-
-    const out = await res.json();
-    alert(out.message || "Saved");
-
-    clearForm();
-    loadEmployees();
+// helper: show toast
+function showToast(message, type='success'){
+  const id = Date.now().toString(36);
+  const el = document.createElement('div');
+  el.className = 'toast ' + (type==='error' ? 'toast-error' : 'toast-success');
+  el.innerText = message;
+  el.id = 't-'+id;
+  document.getElementById('toastWrap').appendChild(el);
+  setTimeout(()=> el.classList.add('show'), 50);
+  setTimeout(()=> {
+    el.classList.remove('show');
+    setTimeout(()=> el.remove(), 300);
+  }, 3000);
 }
 
-
-// CLEAR FORM
-function clearForm(){
-    ename.value = "";
-    eemail.value = "";
-    edept.value = "";
-    esalary.value = "";
+// photo storage (localStorage) keyed by email
+function savePhotoForEmail(email, dataURL){
+  if(!email) return;
+  try{
+    const key = 'emp_photo_' + email.toLowerCase();
+    localStorage.setItem(key, dataURL);
+  }catch(e){}
+}
+function getPhotoForEmail(email){
+  if(!email) return null;
+  const key = 'emp_photo_' + email.toLowerCase();
+  return localStorage.getItem(key);
+}
+function removePhotoForEmail(email){
+  if(!email) return;
+  const key = 'emp_photo_' + email.toLowerCase();
+  localStorage.removeItem(key);
 }
 
-// =====================================
-// LOAD EMPLOYEES LIST
-// =====================================
-async function loadEmployees(){
-    const res = await fetch("/api/employees", {
-        headers:{
-            "Authorization":"Bearer " + localStorage.getItem("token")
-        }
-    });
+/* ============================
+   UI rendering
+   ============================ */
 
+function renderAvatarLetter(name){
+  if(!name) return 'A';
+  return name.split(' ').map(s=>s[0]||'').slice(0,2).join('').toUpperCase();
+}
+
+function departmentBadge(dept){
+  if(!dept) return `<span class="badge" style="background:#f3f4f6;color:#111">N/A</span>`;
+  const cls = dept.toLowerCase() === 'it' ? 'dept-it' :
+              dept.toLowerCase() === 'hr' ? 'dept-hr' :
+              dept.toLowerCase() === 'sales' ? 'dept-sales' : '';
+  return `<span class="badge ${cls}">${dept}</span>`;
+}
+
+function applyFiltersAndSort(){
+  // filter by search & dept
+  filteredEmployees = allEmployees.filter(e=>{
+    const q = currentSearch.trim().toLowerCase();
+    const matchesSearch = !q || (e.name && e.name.toLowerCase().includes(q)) || (e.email && e.email.toLowerCase().includes(q));
+    const matchesDept = !currentDept || (e.department && e.department === currentDept);
+    return matchesSearch && matchesDept;
+  });
+
+  // sort
+  if(currentSort === 'name-asc'){
+    filteredEmployees.sort((a,b)=> (a.name||'').localeCompare(b.name||''));
+  } else if(currentSort === 'name-desc'){
+    filteredEmployees.sort((a,b)=> (b.name||'').localeCompare(a.name||''));
+  } else if(currentSort === 'salary-desc'){
+    filteredEmployees.sort((a,b)=> (Number(b.basic_salary)||0)-(Number(a.basic_salary)||0));
+  } else if(currentSort === 'salary-asc'){
+    filteredEmployees.sort((a,b)=> (Number(a.basic_salary)||0)-(Number(b.basic_salary)||0));
+  } else {
+    // newest: backend returns recent first often; keep server order but allow search/filter
+  }
+
+  // pagination clamp
+  const totalPages = Math.max(1, Math.ceil(filteredEmployees.length / PAGE_SIZE));
+  if(currentPage > totalPages) currentPage = totalPages;
+}
+
+function renderTable(){
+  applyFiltersAndSort();
+  const start = (currentPage-1)*PAGE_SIZE;
+  const pageItems = filteredEmployees.slice(start, start+PAGE_SIZE);
+  const tbody = document.getElementById('tbody');
+  let html = '';
+  if(pageItems.length === 0){
+    html = `<tr><td colspan="4" style="padding:18px;text-align:center;color:var(--muted)">No employees found</td></tr>`;
+    tbody.innerHTML = html;
+    renderPagination();
+    return;
+  }
+  pageItems.forEach(e=>{
+    const photo = getPhotoForEmail(e.email);
+    const avatarHtml = photo ? `<span class="avatar-sm"><img src="${photo}" style="width:36px;height:36px;object-fit:cover;border-radius:8px"></span>` : `<span class="avatar-sm" style="background:#f8fbff;display:inline-block;padding:6px;border-radius:8px;color:var(--accent-2);font-weight:700;text-align:center">${renderAvatarLetter(e.name)}</span>`;
+    const deptBadge = departmentBadge(e.department);
+    const highSalClass = Number(e.basic_salary) >= 50000 ? 'high-sal' : '';
+    html += `<tr class="${highSalClass}">
+      <td>${avatarHtml}<strong>${e.name}</strong><div style="color:var(--muted);font-size:13px">${e.email}</div></td>
+      <td>${deptBadge}</td>
+      <td>₹ ${Number(e.basic_salary || 0).toLocaleString()}</td>
+      <td>
+        <button class="action-btn edit-btn" onclick="openEditModal(${e.id})">Edit</button>
+        <button class="action-btn delete-btn" onclick="onDelete(${e.id}, '${(e.email||'').replace(/'/g,'\\\'')}')">Delete</button>
+      </td>
+    </tr>`;
+  });
+  tbody.innerHTML = html;
+  renderPagination();
+}
+
+function renderPagination(){
+  const totalPages = Math.max(1, Math.ceil(filteredEmployees.length / PAGE_SIZE));
+  const wrap = document.getElementById('pagination');
+  let html = '';
+  if(totalPages <= 1){ wrap.innerHTML = ''; return; }
+  if(currentPage > 1) html += `<button class="page-btn" onclick="gotoPage(${currentPage-1})">Prev</button>`;
+  // show few pages
+  const start = Math.max(1, currentPage-2);
+  const end = Math.min(totalPages, currentPage+2);
+  for(let p=start;p<=end;p++){
+    if(p===currentPage) html += `<button class="page-btn" style="background:var(--accent);color:white;border-color:transparent" onclick="gotoPage(${p})">${p}</button>`;
+    else html += `<button class="page-btn" onclick="gotoPage(${p})">${p}</button>`;
+  }
+  if(currentPage < totalPages) html += `<button class="page-btn" onclick="gotoPage(${currentPage+1})">Next</button>`;
+  wrap.innerHTML = html;
+}
+function gotoPage(p){ currentPage = p; renderTable(); }
+
+/* ============================
+   Data fetching & CRUD
+   Keep backend endpoints unchanged
+   ============================ */
+
+async function loadEmployeesFromServer(){
+  try{
+    const res = await fetch("/api/employees", { headers: { "Authorization":"Bearer " + localStorage.getItem("token") }});
     const j = await res.json();
+    allEmployees = j.employees || [];
+    currentPage = 1;
+    renderTable();
+  }catch(err){
+    showToast('Failed to load employees', 'error');
+    console.error(err);
+  }
+}
 
-    let html = `
-        <tr>
-          <th>Name</th>
-          <th>Email</th>
-          <th>Dept</th>
-          <th>Basic Salary</th>
-          <th>Action</th>
-        </tr>
-    `;
+// add or update via main form
+document.getElementById('saveBtn').addEventListener('click', async ()=>{
+  const name = document.getElementById('ename').value.trim();
+  const email = document.getElementById('eemail').value.trim();
+  const dept = document.getElementById('edept').value;
+  const salary = document.getElementById('esalary').value;
 
-    (j.employees || []).forEach(e => {
-        html += `
-        <tr>
-          <td>${e.name}</td>
-          <td>${e.email}</td>
-          <td>${e.department}</td>
-          <td>${e.basic_salary}</td>
-          <td>
-            <button onclick="editEmp(${e.id}, '${e.name}', '${e.email}', '${e.department}', '${e.basic_salary}')"
-              style="background:#facc15;padding:6px;border-radius:6px;border:0;cursor:pointer;margin-right:6px">
-              Edit
-            </button>
+  if(!name || !email || !dept || !salary){ showToast('Please fill all required fields', 'error'); return; }
 
-            <button onclick="delEmp(${e.id})"
-              style="background:#ef4444;padding:6px 10px;border-radius:6px;border:0;color:white;cursor:pointer">
-              Delete
-            </button>
-          </td>
-        </tr>
-        `;
+  // if editing via form (we only support edit via modal), but keep updateId safe
+  if(editingId){
+    // fallback — update via API
+    try{
+      const res = await fetch(`/api/employees/${editingId}`, {
+        method:'PUT',
+        headers:{ "Content-Type":"application/json", "Authorization":"Bearer " + localStorage.getItem("token") },
+        body: JSON.stringify({ name, email, department:dept, basic_salary: salary })
+      });
+      const out = await res.json();
+      showToast(out.message || 'Updated');
+      if(stagedPhoto) savePhotoForEmail(email, stagedPhoto);
+      editingId = null;
+      clearForm();
+      await loadEmployeesFromServer();
+    }catch(e){ showToast('Update failed','error'); }
+    return;
+  }
+
+  // create
+  try{
+    const res = await fetch("/api/employees", {
+      method: "POST",
+      headers: { "Content-Type":"application/json", "Authorization":"Bearer " + localStorage.getItem("token") },
+      body: JSON.stringify({ name, email, department:dept, basic_salary: salary })
     });
+    const out = await res.json();
+    showToast(out.message || 'Saved');
+    if(stagedPhoto) savePhotoForEmail(email, stagedPhoto);
+    clearForm();
+    await loadEmployeesFromServer();
+  }catch(err){
+    showToast('Save failed', 'error');
+    console.error(err);
+  }
+});
 
-    etable.innerHTML = html;
+// delete
+async function onDelete(id, email){
+  // custom confirm modal (simple)
+  const ok = confirm('Delete this employee permanently?');
+  if(!ok) return;
+  try{
+    await fetch(`/api/employees/${id}`, { method:'DELETE', headers:{ "Authorization":"Bearer " + localStorage.getItem("token") }});
+    // remove local photo
+    if(email) removePhotoForEmail(email);
+    showToast('Deleted');
+    await loadEmployeesFromServer();
+  }catch(e){ showToast('Delete failed','error'); }
 }
 
+/* ============================
+   Search / Filter / Sort handlers
+   ============================ */
 
-// =====================================
-// EDIT EMPLOYEE
-// =====================================
-function editEmp(id, name, email, dept, salary){
-    updateId = id;
+document.getElementById('searchInput').addEventListener('input', (e)=>{
+  currentSearch = e.target.value;
+  currentPage = 1;
+  renderTable();
+});
+document.getElementById('clearSearch').addEventListener('click', ()=>{
+  document.getElementById('searchInput').value = '';
+  currentSearch = '';
+  currentPage = 1;
+  renderTable();
+});
+document.getElementById('deptFilter').addEventListener('change', (e)=>{
+  currentDept = e.target.value;
+  currentPage = 1;
+  renderTable();
+});
+document.getElementById('sortSelect').addEventListener('change', (e)=>{
+  currentSort = e.target.value;
+  currentPage = 1;
+  renderTable();
+});
 
-    ename.value = name;
-    eemail.value = email;
-    edept.value = dept;
-    esalary.value = salary;
+/* ============================
+   Photo upload & preview
+   ============================ */
 
-    alert("Now edit fields and press SAVE to update.");
+document.getElementById('photoInput').addEventListener('change', async (ev)=>{
+  const f = ev.target.files[0];
+  if(!f) return;
+  const reader = new FileReader();
+  reader.onload = function(e){
+    stagedPhoto = e.target.result; // dataURL
+    document.getElementById('photoPreview').innerHTML = `<img src="${stagedPhoto}">`;
+  };
+  reader.readAsDataURL(f);
+});
+
+// clear form
+function clearForm(){
+  document.getElementById('ename').value = '';
+  document.getElementById('eemail').value = '';
+  document.getElementById('edept').value = '';
+  document.getElementById('esalary').value = '';
+  stagedPhoto = null;
+  document.getElementById('photoPreview').innerHTML = 'A';
 }
 
+/* ============================
+   Modal (edit) logic
+   ============================ */
 
-// =====================================
-// DELETE EMPLOYEE
-// =====================================
-async function delEmp(id){
-    if(!confirm("Delete this employee?")) return;
+function openEditModal(id){
+  const emp = allEmployees.find(x=>x.id === id);
+  if(!emp) { showToast('Employee not found','error'); return; }
+  editingId = id;
+  document.getElementById('m_name').value = emp.name||'';
+  document.getElementById('m_email').value = emp.email||'';
+  document.getElementById('m_salary').value = emp.basic_salary||'';
+  document.getElementById('m_dept').value = emp.department||'IT';
+  modalStagedPhoto = getPhotoForEmail(emp.email);
+  if(modalStagedPhoto) document.getElementById('m_photo_preview').innerHTML = `<img src="${modalStagedPhoto}">`;
+  else document.getElementById('m_photo_preview').innerText = (emp.name||'A').split(' ').map(s=>s[0]||'').slice(0,2).join('').toUpperCase();
 
-    await fetch(`/api/employees/${id}`, {
-        method:"DELETE",
-        headers:{
-            "Authorization":"Bearer " + localStorage.getItem("token")
-        }
+  // show modal
+  document.getElementById('modalBackdrop').style.display = 'flex';
+}
+
+// modal file input
+document.getElementById('m_photo_input').addEventListener('change', function(ev){
+  const f = ev.target.files[0];
+  if(!f) return;
+  const r = new FileReader();
+  r.onload = function(e){
+    modalStagedPhoto = e.target.result;
+    document.getElementById('m_photo_preview').innerHTML = `<img src="${modalStagedPhoto}">`;
+  };
+  r.readAsDataURL(f);
+});
+
+document.getElementById('modalClose').addEventListener('click', closeModal);
+document.getElementById('modalCancel').addEventListener('click', closeModal);
+function closeModal(){
+  document.getElementById('modalBackdrop').style.display = 'none';
+  editingId = null;
+  modalStagedPhoto = null;
+}
+
+// save modal changes
+document.getElementById('modalSave').addEventListener('click', async ()=>{
+  if(!editingId) return closeModal();
+  const name = document.getElementById('m_name').value.trim();
+  const salary = document.getElementById('m_salary').value;
+  const dept = document.getElementById('m_dept').value;
+  const email = document.getElementById('m_email').value;
+
+  if(!name || !salary || !dept){ showToast('Please fill all fields','error'); return; }
+
+  try{
+    const res = await fetch(`/api/employees/${editingId}`, {
+      method:'PUT',
+      headers:{ "Content-Type":"application/json", "Authorization":"Bearer " + localStorage.getItem("token") },
+      body: JSON.stringify({ name, email, department:dept, basic_salary: salary })
     });
+    const out = await res.json();
+    showToast(out.message || 'Updated');
 
-    loadEmployees();
-}
+    // save photo to localStorage if provided
+    if(modalStagedPhoto) savePhotoForEmail(email, modalStagedPhoto);
 
+    closeModal();
+    await loadEmployeesFromServer();
+  }catch(e){
+    showToast('Update failed','error');
+    console.error(e);
+  }
+});
 
-// INITIAL LOAD
-loadEmployees();
+/* ============================
+   Init load
+   ============================ */
+loadEmployeesFromServer();
 
 </script>
-
-
 </body>
 </html>

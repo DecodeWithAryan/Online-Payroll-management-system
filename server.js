@@ -32,7 +32,7 @@ app.get("/", (req, res) => {
 const db = mysql.createConnection({
   host: "localhost",
   user: "root",
-  password: "neha123",
+  password: "ARYANsingh#5",
   database: "payrolldb"
 });
 
@@ -246,11 +246,49 @@ app.get("/api/stats", auth, async (req, res) => {
 // PAYROLL
 // ===============================
 
+// app.post("/api/payroll", auth, async (req, res) => {
+//   const employees = await q("SELECT * FROM employees");
+//   const month = new Date().toISOString().slice(0, 7);
+
+//   for (let e of employees) {
+//     const basic = Number(e.basic_salary);
+//     const hra = basic * 0.15;
+//     const da = basic * 0.05;
+//     const pf = basic * 0.10;
+//     const tds = basic * 0.03;
+//     const net = basic + hra + da - pf - tds;
+
+//     await q(
+//       "INSERT INTO payroll(employee_id,month,basic,hra,da,pf,tds,net_salary) VALUES (?,?,?,?,?,?,?,?)",
+//       [e.id, month, basic, hra, da, pf, tds, net]
+//     );
+//   }
+
+//   res.json({ message: "Payroll Generated for " + month });
+// });
+
 app.post("/api/payroll", auth, async (req, res) => {
+  const month = new Date().toISOString().slice(0, 7);  // YYYY-MM
+
+  // Get all employees
   const employees = await q("SELECT * FROM employees");
-  const month = new Date().toISOString().slice(0, 7);
+
+  let countNew = 0;
 
   for (let e of employees) {
+
+    // ❗ Check if payroll for this employee already exists for this month
+    const existing = await q(
+      "SELECT id FROM payroll WHERE employee_id = ? AND month = ?",
+      [e.id, month]
+    );
+
+    if (existing.length > 0) {
+      // Already generated → skip
+      continue;
+    }
+
+    // Calculate components
     const basic = Number(e.basic_salary);
     const hra = basic * 0.15;
     const da = basic * 0.05;
@@ -258,14 +296,23 @@ app.post("/api/payroll", auth, async (req, res) => {
     const tds = basic * 0.03;
     const net = basic + hra + da - pf - tds;
 
+    // Insert new payroll
     await q(
       "INSERT INTO payroll(employee_id,month,basic,hra,da,pf,tds,net_salary) VALUES (?,?,?,?,?,?,?,?)",
       [e.id, month, basic, hra, da, pf, tds, net]
     );
+
+    countNew++;
   }
 
-  res.json({ message: "Payroll Generated for " + month });
+  if (countNew === 0) {
+    res.json({ message: "✔ Payroll already generated for all employees this month." });
+  } else {
+    res.json({ message: `✔ Payroll generated for ${countNew} new employee(s).` });
+  }
 });
+
+
 
 app.get("/api/payroll", auth, async (req, res) => {
   const rows = await q(

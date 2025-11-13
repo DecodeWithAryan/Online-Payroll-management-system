@@ -6,60 +6,132 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
+/* GLOBAL */
 body{
   margin:0;
   font-family:Poppins,Arial;
-  background:#eef3f9;
+  background:linear-gradient(135deg,#dbeafe,#eef3ff,#ffffff);
 }
+
+/* HEADER */
 header{
-  background:#1e3a8a;
+  background:linear-gradient(90deg,#1e3a8a,#2563eb,#3b82f6);
   padding:18px;
   text-align:center;
   color:white;
-  font-size:22px;
-  font-weight:600;
-}
-.container{
-  max-width:900px;
-  margin:25px auto;
-  background:#fff;
-  padding:20px;
-  border-radius:12px;
-  box-shadow:0 6px 25px rgba(0,0,0,0.08);
+  font-size:24px;
+  font-weight:700;
+  box-shadow:0 6px 25px rgba(0,0,0,0.2);
 }
 
+/* CONTAINER */
+.container{
+  max-width:1000px;
+  margin:25px auto;
+  background:rgba(255,255,255,0.85);
+  padding:25px;
+  border-radius:16px;
+  box-shadow:0 10px 40px rgba(0,0,0,0.12);
+  backdrop-filter:blur(4px);
+  animation:fadeIn .8s ease;
+}
+
+@keyframes fadeIn{
+  from{opacity:0;transform:translateY(20px)}
+  to{opacity:1;transform:translateY(0)}
+}
+
+/* BUTTON */
 button{
-  padding:12px;
-  background:#1e40af;
+  padding:14px;
+  background:#2563eb;
   color:white;
   border:0;
-  border-radius:8px;
-  font-size:16px;
+  border-radius:12px;
+  font-size:17px;
   cursor:pointer;
   width:100%;
-  margin-bottom:20px;
+  font-weight:600;
+  box-shadow:0 8px 25px rgba(37,99,235,.35);
+  transition:.3s;
+}
+button:hover{
+  background:#1e4ed8;
+  transform:translateY(-3px);
 }
 
+/* FILTER BAR */
+.controls{
+  display:flex;
+  gap:12px;
+  margin-top:20px;
+  flex-wrap:wrap;
+}
+.search-box{
+  flex:1;
+  background:white;
+  padding:10px 14px;
+  border-radius:10px;
+  display:flex;
+  align-items:center;
+  box-shadow:0 5px 20px rgba(0,0,0,0.06);
+}
+.search-box input{
+  flex:1;border:0;outline:none;font-size:15px;padding-left:10px;
+}
+.select{
+  padding:12px;
+  border-radius:10px;
+  border:1px solid #dfe6f7;
+  font-size:15px;
+}
+
+/* TABLE */
 table{
   width:100%;
   border-collapse:collapse;
-  margin-top:15px;
-}
-th,td{
-  padding:10px;
-  border-bottom:1px solid #dfe4ee;
+  margin-top:20px;
+  border-radius:14px;
+  overflow:hidden;
+  box-shadow:0 8px 25px rgba(0,0,0,0.10);
 }
 th{
-  background:#f3f5fa;
+  background:#eef4ff;
+  padding:14px;
   font-size:15px;
-  text-align:left;
+  font-weight:700;
+  color:#1e293b;
 }
 td{
-  font-size:14px;
+  padding:12px;
+  font-size:15px;
+  border-bottom:1px solid #e7edf7;
 }
-h3{
-  margin:0;
-  margin-bottom:12px;
+tr:hover td{
+  background:#f8fbff;
+}
+.high-sal{
+  background:#f0f7ff !important;
+  border-left:4px solid #2563eb;
+}
+
+/* PAGINATION */
+.pagination{
+  margin-top:14px;
+  display:flex;
+  justify-content:flex-end;
+  gap:8px;
+}
+.page-btn{
+  padding:8px 12px;
+  border-radius:8px;
+  border:1px solid #d0dbf5;
+  cursor:pointer;
+  background:white;
+}
+.page-btn.active{
+  background:#2563eb;
+  color:white;
 }
 </style>
 
@@ -70,85 +142,148 @@ h3{
 
 <div class="container">
 
-  <button onclick="generatePayroll()">Generate Monthly Payroll</button>
+  <!-- GENERATE PAYROLL BUTTON -->
+  <button onclick="generatePayroll()">⚡ Generate Monthly Payroll</button>
 
-  <h3>Payroll History</h3>
+  <!-- FILTER + SEARCH -->
+  <div class="controls">
+    <div class="search-box">
+      🔍 <input id="search" placeholder="Search name or month...">
+    </div>
 
-  <table id="payrollTable">
-    <tr>
-      <th>Month</th>
-      <th>Name</th>
-      <th>Basic</th>
-      <th>HRA</th>
-      <th>DA</th>
-      <th>PF</th>
-      <th>TDS</th>
-      <th>Net</th>
-    </tr>
+    <select id="monthFilter" class="select">
+      <option value="">All Months</option>
+    </select>
+
+    <select id="sortSelect" class="select">
+      <option value="new">Newest First</option>
+      <option value="high">Salary High → Low</option>
+      <option value="low">Salary Low → High</option>
+      <option value="name">Name A → Z</option>
+    </select>
+  </div>
+
+  <!-- PAYROLL TABLE -->
+  <table>
+    <thead>
+      <tr>
+        <th>Month</th>
+        <th>Name</th>
+        <th>Basic</th>
+        <th>HRA</th>
+        <th>DA</th>
+        <th>PF</th>
+        <th>TDS</th>
+        <th>Net</th>
+      </tr>
+    </thead>
+    <tbody id="tbody"></tbody>
   </table>
+
+  <div class="pagination" id="pagination"></div>
 
 </div>
 
 
 <script>
+let all = [];
+let filtered = [];
+let PAGE = 1;
+const SIZE = 10;
 
-// ======================== GENERATE PAYROLL ========================
+/* GENERATE PAYROLL */
 async function generatePayroll(){
   const res = await fetch("/api/payroll", {
     method:"POST",
-    headers:{
-      "Authorization":"Bearer " + localStorage.getItem("token")
-    }
+    headers:{ "Authorization":"Bearer "+localStorage.getItem("token") }
   });
-
   const j = await res.json();
   alert(j.message);
   loadPayroll();
 }
 
-// ======================== LOAD PAYROLL HISTORY ========================
+/* LOAD PAYROLL DATA */
 async function loadPayroll(){
   const res = await fetch("/api/payroll", {
-    headers:{
-      "Authorization":"Bearer " + localStorage.getItem("token")
-    }
+    headers:{ "Authorization":"Bearer "+localStorage.getItem("token") }
   });
-
   const j = await res.json();
 
-  let html = `
-    <tr>
-      <th>Month</th>
-      <th>Name</th>
-      <th>Basic</th>
-      <th>HRA</th>
-      <th>DA</th>
-      <th>PF</th>
-      <th>TDS</th>
-      <th>Net</th>
-    </tr>
-  `;
+  all = j.payrolls || [];
+  fillMonthFilter();
+  applyFilters();
+}
 
-  (j.payrolls || []).forEach(p => {
+function fillMonthFilter(){
+  let months = [...new Set(all.map(x=>x.month))];
+  const sel = document.getElementById("monthFilter");
+  months.forEach(m => sel.innerHTML += `<option>${m}</option>`);
+}
+
+document.getElementById("search").oninput = applyFilters;
+document.getElementById("monthFilter").onchange = applyFilters;
+document.getElementById("sortSelect").onchange = applyFilters;
+
+function applyFilters(){
+  let q = search.value.toLowerCase();
+  let mon = monthFilter.value;
+
+  filtered = all.filter(r => {
+    let ok = true;
+    if(q) ok = r.name.toLowerCase().includes(q) || r.month.includes(q);
+    if(mon) ok = ok && (r.month === mon);
+    return ok;
+  });
+
+  let s = sortSelect.value;
+  if(s === "high") filtered.sort((a,b)=>b.net_salary-a.net_salary);
+  if(s === "low")  filtered.sort((a,b)=>a.net_salary-b.net_salary);
+  if(s === "name") filtered.sort((a,b)=>a.name.localeCompare(b.name));
+
+  PAGE = 1;
+  renderTable();
+}
+
+function renderTable(){
+  let start = (PAGE-1)*SIZE;
+  let page = filtered.slice(start,start+SIZE);
+  let html = "";
+
+  page.forEach(p => {
+    let high = p.net_salary > 50000 ? "high-sal" : "";
     html += `
-      <tr>
+      <tr class="${high}">
         <td>${p.month}</td>
         <td>${p.name}</td>
-        <td>${p.basic}</td>
-        <td>${p.hra}</td>
-        <td>${p.da}</td>
-        <td>${p.pf}</td>
-        <td>${p.tds}</td>
-        <td>${p.net_salary}</td>
+        <td>₹${p.basic}</td>
+        <td>₹${p.hra}</td>
+        <td>₹${p.da}</td>
+        <td>₹${p.pf}</td>
+        <td>₹${p.tds}</td>
+        <td><b>₹${p.net_salary}</b></td>
       </tr>
     `;
   });
 
-  payrollTable.innerHTML = html;
+  tbody.innerHTML = html;
+  renderPagination();
+}
+
+function renderPagination(){
+  let total = Math.ceil(filtered.length / SIZE);
+  let html = "";
+  for(let i=1; i<=total; i++){
+    html += `<button class="page-btn ${i==PAGE?'active':''}" onclick="goto(${i})">${i}</button>`;
+  }
+  pagination.innerHTML = html;
+}
+
+function goto(p){
+  PAGE = p;
+  renderTable();
 }
 
 loadPayroll();
-
 </script>
 
 </body>

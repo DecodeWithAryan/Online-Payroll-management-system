@@ -4,38 +4,312 @@
 <meta charset="utf-8">
 <title>Reports - Payroll</title>
 <meta name="viewport" content="width=device-width,initial-scale=1">
+
 <style>
-  body{margin:0;font-family:Poppins,Arial;background:#f7fafc}
-  header{background:linear-gradient(90deg,#2563eb,#3b82f6);color:#fff;padding:14px;text-align:center}
-  .wrap{max-width:1000px;margin:18px auto;padding:12px}
-  .card{background:#fff;padding:18px;border-radius:12px;box-shadow:0 6px 18px rgba(0,0,0,0.06);margin-bottom:14px}
-  table{width:100%;border-collapse:collapse;margin-top:10px}
-  th,td{padding:10px;border-bottom:1px solid #eef2f6}
-  button{background:#2563eb;color:#fff;padding:10px;border:0;border-radius:8px;cursor:pointer}
+/* Global */
+body{
+  margin:0;
+  font-family:Poppins,Arial;
+  background:linear-gradient(135deg,#e5eeff,#f8fbff,#ffffff);
+}
+
+/* Header */
+header{
+  background:linear-gradient(90deg,#1e3a8a,#2563eb,#3b82f6);
+  color:white;
+  padding:16px;
+  text-align:center;
+  font-size:24px;
+  font-weight:700;
+  box-shadow:0 6px 30px rgba(0,0,0,0.15);
+}
+
+/* Wrapper */
+.wrap{
+  max-width:1100px;
+  margin:26px auto;
+  padding:14px;
+}
+
+/* Card */
+.card{
+  background:rgba(255,255,255,0.85);
+  padding:22px;
+  border-radius:16px;
+  box-shadow:0 10px 40px rgba(0,0,0,0.10);
+  backdrop-filter:blur(4px);
+  animation:fadeIn .6s ease;
+}
+@keyframes fadeIn{
+  from{opacity:0; transform:translateY(20px);}
+  to{opacity:1; transform:translateY(0);}
+}
+
+/* Inputs / Filters */
+.controls{
+  display:flex;
+  gap:12px;
+  margin-bottom:14px;
+  flex-wrap:wrap;
+}
+.search-box{
+  flex:1;
+  background:white;
+  border-radius:10px;
+  display:flex;
+  align-items:center;
+  padding:8px 12px;
+  box-shadow:0 5px 20px rgba(12,15,30,0.08);
+}
+.search-box input{
+  border:0;
+  outline:none;
+  width:100%;
+  font-size:14px;
+  padding-left:6px;
+}
+.select{
+  padding:10px;
+  border-radius:10px;
+  border:1px solid #dce4f6;
+  font-size:14px;
+}
+.btn{
+  background:#2563eb;
+  color:white;
+  padding:10px 16px;
+  border-radius:10px;
+  border:0;
+  cursor:pointer;
+  font-weight:600;
+  box-shadow:0 6px 25px rgba(37,99,235,.35);
+}
+.btn:hover{transform:translateY(-3px);}
+
+/* Table */
+table{
+  width:100%;
+  border-collapse:collapse;
+  margin-top:12px;
+  border-radius:14px;
+  overflow:hidden;
+  box-shadow:0 8px 25px rgba(0,0,0,.08);
+}
+th{
+  background:#eef4ff;
+  padding:14px;
+  font-weight:700;
+  font-size:15px;
+  cursor:pointer;
+  color:#0f172a;
+}
+td{
+  padding:12px;
+  border-bottom:1px solid #e7edf7;
+  font-size:14px;
+}
+tr:hover td{
+  background:#f8fbff;
+}
+
+/* Salary highlight */
+.high-sal{
+  background:#f0f7ff !important;
+  border-left:4px solid #2563eb;
+}
+
+/* Pagination */
+.pagination{
+  display:flex;
+  justify-content:flex-end;
+  gap:8px;
+  margin-top:12px;
+}
+.page-btn{
+  padding:8px 12px;
+  border-radius:8px;
+  border:1px solid #d8e3f8;
+  background:white;
+  cursor:pointer;
+}
+.page-btn.active{
+  background:#2563eb;
+  color:white;
+}
+
+/* Export Buttons */
+.export-wrap{
+  margin-top:12px;
+  display:flex;
+  gap:10px;
+}
 </style>
+
 </head>
 <body>
-<header><div style="font-weight:700">Reports</div></header>
+
+<header>Reports</header>
 
 <div class="wrap">
   <div class="card">
-    <h3>Salary Report</h3>
-    <p style="color:#666">You can view payroll breakdown here.</p>
-    <table id="rtable"><tr><th>Name</th><th>Month</th><th>Basic</th><th>HRA</th><th>DA</th><th>PF</th><th>TDS</th><th>Net</th></tr></table>
+    <h2 style="margin:0;color:#1e293b;font-weight:700">Salary Reports</h2>
+    <p style="color:#64748b;margin-top:6px;margin-bottom:18px;">
+      View complete payroll breakdown with filters, search & export options
+    </p>
+
+    <!-- 🔵 Controls -->
+    <div class="controls">
+      <div class="search-box">
+        🔍
+        <input id="search" placeholder="Search by name or month...">
+      </div>
+
+      <select id="monthFilter" class="select">
+        <option value="">All Months</option>
+      </select>
+
+      <select id="sortSelect" class="select">
+        <option value="new">Newest First</option>
+        <option value="high">Salary High → Low</option>
+        <option value="low">Salary Low → High</option>
+        <option value="name">Name A → Z</option>
+      </select>
+    </div>
+
+    <!-- 🔵 Export Buttons -->
+    <div class="export-wrap">
+      <button class="btn" onclick="exportCSV()">Export CSV</button>
+      <button class="btn" onclick="window.print()">Print PDF</button>
+    </div>
+
+    <!-- 🔵 Table -->
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Month</th>
+          <th>Basic</th>
+          <th>HRA</th>
+          <th>DA</th>
+          <th>PF</th>
+          <th>TDS</th>
+          <th>Net</th>
+        </tr>
+      </thead>
+      <tbody id="tbody"></tbody>
+    </table>
+
+    <div class="pagination" id="pagination"></div>
   </div>
 </div>
 
 <script>
+let all = [];
+let filtered = [];
+let PAGE = 1;
+const SIZE = 8;
+
 async function loadReports(){
-  const res = await fetch('/api/payroll', { headers:{ 'Authorization':'Bearer '+localStorage.getItem('token') }});
-  const j = await res.json();
-  let html = '<tr><th>Name</th><th>Month</th><th>Basic</th><th>HRA</th><th>DA</th><th>PF</th><th>TDS</th><th>Net</th></tr>';
-  (j.payrolls||[]).forEach(p => {
-    html += `<tr><td>${p.name}</td><td>${p.month}</td><td>${p.basic}</td><td>${p.hra}</td><td>${p.da}</td><td>${p.pf}</td><td>${p.tds}</td><td>${p.net_salary}</td></tr>`;
+  const res = await fetch('/api/payroll', {
+    headers:{ 'Authorization':'Bearer '+localStorage.getItem('token') }
   });
-  rtable.innerHTML = html;
+
+  const j = await res.json();
+  all = j.payrolls || [];
+
+  fillMonthFilter();
+  applyFilters();
 }
+
+function fillMonthFilter(){
+  let months = [...new Set(all.map(x=>x.month))];
+  const m = document.getElementById('monthFilter');
+  months.forEach(mon => {
+    m.innerHTML += `<option>${mon}</option>`;
+  });
+}
+
+document.getElementById('search').oninput = applyFilters;
+document.getElementById('monthFilter').onchange = applyFilters;
+document.getElementById('sortSelect').onchange = applyFilters;
+
+function applyFilters(){
+  let q = document.getElementById('search').value.toLowerCase();
+  let mon = document.getElementById('monthFilter').value;
+
+  filtered = all.filter(r => {
+    let ok = true;
+    if(q) ok = r.name.toLowerCase().includes(q) || r.month.includes(q);
+    if(mon) ok = ok && (r.month === mon);
+    return ok;
+  });
+
+  // sorting
+  let s = document.getElementById('sortSelect').value;
+  if(s === 'high') filtered.sort((a,b)=> b.net_salary - a.net_salary);
+  if(s === 'low') filtered.sort((a,b)=> a.net_salary - b.net_salary);
+  if(s === 'name') filtered.sort((a,b)=> a.name.localeCompare(b.name));
+
+  PAGE = 1;
+  renderTable();
+}
+
+function renderTable(){
+  let start = (PAGE-1)*SIZE;
+  let pageData = filtered.slice(start, start+SIZE);
+
+  let html = '';
+  pageData.forEach(r => {
+    let highlight = r.net_salary > 50000 ? 'high-sal' : '';
+    html += `
+      <tr class="${highlight}">
+        <td>${r.name}</td>
+        <td>${r.month}</td>
+        <td>₹${r.basic}</td>
+        <td>₹${r.hra}</td>
+        <td>₹${r.da}</td>
+        <td>₹${r.pf}</td>
+        <td>₹${r.tds}</td>
+        <td><b>₹${r.net_salary}</b></td>
+      </tr>
+    `;
+  });
+
+  document.getElementById('tbody').innerHTML = html;
+  renderPagination();
+}
+
+function renderPagination(){
+  let total = Math.ceil(filtered.length / SIZE);
+  let html = '';
+
+  for(let i=1; i<=total; i++){
+    html += `<button class="page-btn ${i==PAGE?'active':''}" onclick="gotoPage(${i})">${i}</button>`;
+  }
+  document.getElementById('pagination').innerHTML = html;
+}
+
+function gotoPage(p){
+  PAGE = p;
+  renderTable();
+}
+
+/* ---------- Export CSV ---------- */
+function exportCSV(){
+  let csv = "Name,Month,Basic,HRA,DA,PF,TDS,Net\n";
+  filtered.forEach(r=>{
+    csv += `${r.name},${r.month},${r.basic},${r.hra},${r.da},${r.pf},${r.tds},${r.net_salary}\n`;
+  });
+
+  let blob = new Blob([csv], {type:'text/csv'});
+  let link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+  link.download = "Payroll_Report.csv";
+  link.click();
+}
+
 loadReports();
 </script>
+
 </body>
 </html>
