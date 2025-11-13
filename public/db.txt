@@ -39,3 +39,17 @@ CREATE TABLE IF NOT EXISTS payroll (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (employee_id) REFERENCES employees(id) ON DELETE CASCADE
 );
+
+
+//execute these two when you tackle with any error
+ALTER TABLE payroll 
+ADD COLUMN da DOUBLE;
+
+
+ALTER TABLE payroll 
+ADD COLUMN hra DOUBLE,
+ADD COLUMN da DOUBLE,
+ADD COLUMN pf DOUBLE,
+ADD COLUMN tds DOUBLE,
+ADD COLUMN net_salary DOUBLE;
+
