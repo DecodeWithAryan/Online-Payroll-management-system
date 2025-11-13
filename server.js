@@ -3,6 +3,10 @@
 // Backend: Node + Express + MySQL
 // ===============================
 
+//2
+require("dotenv").config();
+
+
 const express = require("express");
 const mysql = require("mysql2");
 const cors = require("cors");
@@ -26,23 +30,50 @@ app.get("/", (req, res) => {
   res.sendFile(path.join(PUBLIC_DIR, "auth.html"));
 });
 
+
+//3
 // ===============================
 // DATABASE CONNECTION
 // ===============================
-const db = mysql.createConnection({
-  host: "localhost",
-  user: "root",
-  password: "ARYANsingh#5",
-  database: "payrolldb"
+// const db = mysql.createConnection({
+//   host: "localhost",
+//   user: "root",
+//   password: "ARYANsingh#5",
+//   database: "payrolldb"
+// });
+
+require("dotenv").config();
+const mysql = require("mysql2/promise");
+
+const db = mysql.createPool({
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASS,
+  database: process.env.DB_NAME
 });
 
-db.connect(err => {
-  if (err) {
-    console.log("❌ SQL ERROR:", err);
-  } else {
+
+
+//4
+// db.connect(err => {
+//   if (err) {
+//     console.log("❌ SQL ERROR:", err);
+//   } else {
+//     console.log("✔ SQL Connected Successfully");
+//   }
+// });
+
+//4
+(async () => {
+  try {
+    await db.getConnection();
     console.log("✔ SQL Connected Successfully");
+  } catch (err) {
+    console.log("❌ SQL ERROR:", err);
   }
-});
+})();
+
+
 
 const SECRET = "NEHA_2025_SECRET";
 
@@ -324,6 +355,15 @@ app.get("/api/payroll", auth, async (req, res) => {
 // ===============================
 // START SERVER
 // ===============================
-app.listen(3000, () => {
-  console.log("✔ Server Running on http://localhost:3000");
+// app.listen(3000, () => {
+//   console.log("✔ Server Running on http://localhost:3000");
+// });
+
+
+//1
+const PORT = process.env.PORT || 3000;
+
+app.listen(PORT, () => {
+  console.log(`✔ Server Running on PORT ${PORT}`);
 });
+
